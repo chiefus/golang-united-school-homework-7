@@ -1,7 +1,12 @@
 package coverage
 
 import (
+	//	"fmt"
 	"os"
+	"reflect"
+	"sort"
+	"testing"
+	"time"
 )
 
 // DO NOT EDIT THIS FUNCTION
@@ -18,3 +23,454 @@ func init() {
 
 // WRITE YOUR CODE BELOW
 
+var baseBirthday = time.Date(2022, time.June, 6, 0, 0, 0, 0, time.UTC)
+
+func TestSortPeople(t *testing.T) {
+	testCases := map[string]People{
+		"Test sort by birthdays": {
+			Person{
+				firstName: "Luke",
+				lastName:  "Skywalker",
+				birthDay:  baseBirthday.AddDate(2, 2, 2),
+			},
+			Person{
+				firstName: "Obi-Wan",
+				lastName:  "Kenobi",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday.AddDate(1, 1, 1),
+			},
+		},
+		"Test sort by first names": {
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Obi-Wan",
+				lastName:  "Kenobi",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Luke",
+				lastName:  "Skywalker",
+				birthDay:  baseBirthday,
+			},
+		},
+		"Test sort by last names": {
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Kenobi",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Skywalker",
+				birthDay:  baseBirthday,
+			},
+		},
+		"Test sort when all items are equal": {
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+		},
+	}
+
+	expectedValues := map[string]People{
+		"Test sort by birthdays": {
+			Person{
+				firstName: "Luke",
+				lastName:  "Skywalker",
+				birthDay:  baseBirthday.AddDate(2, 2, 2),
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday.AddDate(1, 1, 1),
+			},
+			Person{
+				firstName: "Obi-Wan",
+				lastName:  "Kenobi",
+				birthDay:  baseBirthday,
+			},
+		},
+		"Test sort by first names": {
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Luke",
+				lastName:  "Skywalker",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Obi-Wan",
+				lastName:  "Kenobi",
+				birthDay:  baseBirthday,
+			},
+		},
+		"Test sort by last names": {
+			Person{
+				firstName: "Darth",
+				lastName:  "Kenobi",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Skywalker",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+		},
+		"Test sort when all items are equal": {
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+		},
+	}
+
+	for testName, testData := range testCases {
+		t.Run(testName, func(t *testing.T) {
+			expectedValue := expectedValues[testName]
+			sort.Stable(testData)
+			comparisonResult := reflect.DeepEqual(testData, expectedValue)
+			if !comparisonResult {
+				t.Errorf("Sort() failed. Exp: %v got: %v", expectedValue, testData)
+				// fails on "by birthdays", as it should
+				//t.Errorf("Sort() failed. Exp: %v got: %v", expected, people)
+			}
+		})
+	}
+}
+
+func TestLenPeople(t *testing.T) {
+	testCases := map[string]People{
+		"Test Zero Items": {},
+		"Test One Item": {
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+		},
+		"Test Two Items": {
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Kenobi",
+				birthDay:  baseBirthday,
+			},
+		},
+		"Test Three Items": {
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+			Person{
+				firstName: "Darth",
+				lastName:  "Vader",
+				birthDay:  baseBirthday,
+			},
+		},
+	}
+
+	expectedValues := map[string]int{
+		"Test Zero Items":  0,
+		"Test One Item":    1,
+		"Test Two Items":   2,
+		"Test Three Items": 3,
+	}
+
+	for testName, testData := range testCases {
+		t.Run(testName, func(t *testing.T) {
+			expectedValue := expectedValues[testName]
+			resultedLength := testData.Len()
+			if resultedLength != expectedValue {
+				t.Errorf("Len() failed. Exp: %v got: %v", expectedValue, resultedLength)
+				// fails on "by birthdays", as it should
+				//t.Errorf("Sort() failed. Exp: %v got: %v", expected, people)
+			}
+		})
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func TestMatrix_New(t *testing.T) {
+	cases := map[string]struct {
+		str      string
+		expected *Matrix
+		hasError bool
+	}{
+		"different row lengths long short": {
+			`1 2
+3`,
+			nil,
+			true},
+		"different row lengths short long": {
+			`1
+2 3`,
+			nil,
+			true},
+		"bad element": {
+			`a 2
+3 4`,
+			nil,
+			true},
+		"simple matrix": {
+			`1 2
+3 4`,
+			&Matrix{2, 2, []int{1, 2, 3, 4}},
+			false},
+		"single element": {
+			`42`,
+			&Matrix{1, 1, []int{42}},
+			false},
+		"one column": {
+			`1
+2
+3
+4`,
+			&Matrix{4, 1, []int{1, 2, 3, 4}},
+			false},
+		"one row": {
+			`1 2 3 4`,
+			&Matrix{1, 4, []int{1, 2, 3, 4}},
+			false},
+	}
+
+	for name, data := range cases {
+		d := data
+		t.Run(name, func(t *testing.T) {
+			m, err := New(d.str)
+			if d.hasError {
+				if err == nil {
+					t.Fatal("error must be returned on error condition")
+				}
+				if m != nil {
+					t.Fatal("non-nil return on error condition")
+				}
+			} else {
+				if err != nil {
+					t.Fatal("unexpected error:", err)
+				}
+				if m == nil {
+					t.Fatal("nil return on error condition")
+				}
+				if !reflect.DeepEqual(*m, *d.expected) {
+					t.Fatalf("New() failed. Exp: %v got: %v", *d.expected, *m)
+				}
+			}
+		})
+	}
+}
+
+func TestMatrix_Rows(t *testing.T) {
+	cases := map[string]struct {
+		str      string
+		expected [][]int
+	}{
+		"simple matrix": {
+			`1 2
+3 4`,
+			[][]int{{1, 2}, {3, 4}},
+		},
+		"single element": {
+			`42`,
+			[][]int{{42}},
+		},
+		"one column": {
+			`1
+2
+3
+4`,
+			[][]int{{1}, {2}, {3}, {4}},
+		},
+		"one row": {
+			`1 2 3 4`,
+			[][]int{{1, 2, 3, 4}},
+		},
+	}
+	for name, data := range cases {
+		d := data
+		t.Run(name, func(t *testing.T) {
+			m, err := New(d.str)
+			if err != nil {
+				t.Fatal("New(): unexpected error:", err)
+			}
+			if m == nil {
+				t.Fatal("New(): nil return on error condition")
+			}
+			rows := m.Rows()
+			if rows == nil {
+				t.Fatal("Rows(): nil return on error condition")
+			}
+			if !reflect.DeepEqual(rows, d.expected) {
+				t.Fatalf("New() failed. Exp: %v got: %v", d.expected, rows)
+			}
+		})
+	}
+}
+
+func TestMatrix_Cols(t *testing.T) {
+	cases := map[string]struct {
+		str      string
+		expected [][]int
+	}{
+		"simple matrix": {
+			`1 2
+3 4`,
+			[][]int{{1, 3}, {2, 4}},
+		},
+		"single element": {
+			`42`,
+			[][]int{{42}},
+		},
+		"one column": {
+			`1
+2
+3
+4`,
+			[][]int{{1, 2, 3, 4}},
+		},
+		"one row": {
+			`1 2 3 4`,
+			[][]int{{1}, {2}, {3}, {4}},
+		},
+	}
+	for name, data := range cases {
+		d := data
+		t.Run(name, func(t *testing.T) {
+			m, err := New(d.str)
+			if err != nil {
+				t.Fatal("New(): unexpected error:", err)
+			}
+			if m == nil {
+				t.Fatal("New(): nil return on error condition")
+			}
+			cols := m.Cols()
+			if cols == nil {
+				t.Fatal("Rows(): nil return on error condition")
+			}
+			if !reflect.DeepEqual(cols, d.expected) {
+				t.Fatalf("New() failed. Exp: %v got: %v", d.expected, cols)
+			}
+		})
+	}
+}
+
+func TestMatrix_Set(t *testing.T) {
+	cases := map[string]struct {
+		row, col, value int
+		expected        *Matrix
+		ok              bool
+	}{
+		"row underflow": {
+			-1, 0, 42,
+			&Matrix{2, 2, []int{1, 2, 3, 4}},
+			false,
+		},
+		"row overflow": {
+			2, 0, 42,
+			&Matrix{2, 2, []int{1, 2, 3, 4}},
+			false,
+		},
+		"col underflow": {
+			0, -1, 42,
+			&Matrix{2, 2, []int{1, 2, 3, 4}},
+			false,
+		},
+		"col overflow": {
+			0, 2, 42,
+			&Matrix{2, 2, []int{1, 2, 3, 4}},
+			false,
+		},
+		"set 0 0": {
+			0, 0, 42,
+			&Matrix{2, 2, []int{42, 2, 3, 4}},
+			true,
+		},
+		"set 0 1": {
+			0, 1, 42,
+			&Matrix{2, 2, []int{1, 42, 3, 4}},
+			true,
+		},
+		"set 1 0": {
+			1, 0, 42,
+			&Matrix{2, 2, []int{1, 2, 42, 4}},
+			true,
+		},
+		"set 1 1": {
+			1, 1, 42,
+			&Matrix{2, 2, []int{1, 2, 3, 42}},
+			true,
+		},
+	}
+	for name, data := range cases {
+		d := data
+
+		t.Run(name, func(t *testing.T) {
+			m, err := New(`1 2
+3 4`)
+			if err != nil {
+				t.Fatal("New(): unexpected error:", err)
+			}
+			ok := m.Set(d.row, d.col, d.value)
+			if ok != d.ok {
+				t.Errorf("unexpected ok value: exp: %v, got: %v", d.ok, ok)
+			}
+			if !reflect.DeepEqual(*m, *d.expected) {
+				t.Fatalf("unexpected set results. Exp: %v got: %v", *d.expected, *m)
+			}
+		})
+	}
+}
