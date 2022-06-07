@@ -246,68 +246,64 @@ func TestLenPeople(t *testing.T) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func TestMatrix_New(t *testing.T) {
-	cases := map[string]struct {
+	testCases := map[string]struct {
 		str      string
 		expected *Matrix
 		hasError bool
 	}{
-		"different row lengths long short": {
-			`1 2
-3`,
-			nil,
-			true},
-		"different row lengths short long": {
-			`1
+		"Test of 2x2 matrix creation": {
+			`0 1
 2 3`,
-			nil,
-			true},
-		"bad element": {
-			`a 2
-3 4`,
-			nil,
-			true},
-		"simple matrix": {
-			`1 2
-3 4`,
-			&Matrix{2, 2, []int{1, 2, 3, 4}},
+			&Matrix{2, 2, []int{0, 1, 2, 3}},
 			false},
-		"single element": {
-			`42`,
-			&Matrix{1, 1, []int{42}},
+		"Test of 1x1 matrix creation": {
+			`0`,
+			&Matrix{1, 1, []int{0}},
 			false},
-		"one column": {
-			`1
+		"Test of 1x4 matrix creation": {
+			`0 1 2 3`,
+			&Matrix{1, 4, []int{0, 1, 2, 3}},
+			false},
+		"Test of 4x1 matrix creation": {
+			`0
+1
 2
-3
-4`,
-			&Matrix{4, 1, []int{1, 2, 3, 4}},
+3`,
+			&Matrix{4, 1, []int{0, 1, 2, 3}},
 			false},
-		"one row": {
-			`1 2 3 4`,
-			&Matrix{1, 4, []int{1, 2, 3, 4}},
-			false},
+		"Test of bad input: not equal row lengths": {
+			`0 1 2 3
+4 5`,
+			nil,
+			true},
+
+		"Test of bad input: character instead digit": {
+			`0 1
+f 3`,
+			nil,
+			true},
 	}
 
-	for name, data := range cases {
-		d := data
-		t.Run(name, func(t *testing.T) {
-			m, err := New(d.str)
-			if d.hasError {
+	for testName, testData := range testCases {
+		data := testData
+		t.Run(testName, func(t *testing.T) {
+			matrix, err := New(data.str)
+			if data.hasError {
 				if err == nil {
-					t.Fatal("error must be returned on error condition")
+					t.Fatal("The error should have been returned as a test result")
 				}
-				if m != nil {
-					t.Fatal("non-nil return on error condition")
+				if matrix != nil {
+					t.Fatal("The test should have returned nil matrix")
 				}
 			} else {
 				if err != nil {
-					t.Fatal("unexpected error:", err)
+					t.Fatal("Error during matrix creation:", err)
 				}
-				if m == nil {
-					t.Fatal("nil return on error condition")
+				if matrix == nil {
+					t.Fatal("Empty matrix has been returned")
 				}
-				if !reflect.DeepEqual(*m, *d.expected) {
-					t.Fatalf("New() failed. Exp: %v got: %v", *d.expected, *m)
+				if !reflect.DeepEqual(*matrix, *data.expected) {
+					t.Fatalf("Matrix was created incorrectly. Expected: %v got: %v", *data.expected, *matrix)
 				}
 			}
 		})
@@ -315,161 +311,161 @@ func TestMatrix_New(t *testing.T) {
 }
 
 func TestMatrix_Rows(t *testing.T) {
-	cases := map[string]struct {
+	testCases := map[string]struct {
 		str      string
 		expected [][]int
 	}{
-		"simple matrix": {
-			`1 2
-3 4`,
-			[][]int{{1, 2}, {3, 4}},
+		"Test Rows() of 2x2 matrix": {
+			`0 1
+2 3`,
+			[][]int{{0, 1}, {2, 3}},
 		},
-		"single element": {
-			`42`,
-			[][]int{{42}},
+		"Test of Rows() 1x1 matrix": {
+			`0`,
+			[][]int{{0}},
 		},
-		"one column": {
-			`1
+		"Test of of Rows() 1x4 matrix": {
+			`0 1 2 3`,
+			[][]int{{0, 1, 2, 3}},
+		},
+		"Test of of Rows()4x1 matrix": {
+			`0
+1
 2
-3
-4`,
-			[][]int{{1}, {2}, {3}, {4}},
-		},
-		"one row": {
-			`1 2 3 4`,
-			[][]int{{1, 2, 3, 4}},
+3`,
+			[][]int{{0}, {1}, {2}, {3}},
 		},
 	}
-	for name, data := range cases {
-		d := data
-		t.Run(name, func(t *testing.T) {
-			m, err := New(d.str)
+	for testName, testData := range testCases {
+		data := testData
+		t.Run(testName, func(t *testing.T) {
+			matrix, err := New(data.str)
 			if err != nil {
-				t.Fatal("New(): unexpected error:", err)
+				t.Fatal("Error during matrix creation:", err)
 			}
-			if m == nil {
-				t.Fatal("New(): nil return on error condition")
+			if matrix == nil {
+				t.Fatal("Nil matrix has been returned")
 			}
-			rows := m.Rows()
+			rows := matrix.Rows()
 			if rows == nil {
-				t.Fatal("Rows(): nil return on error condition")
+				t.Fatal("Rows() returned nil")
 			}
-			if !reflect.DeepEqual(rows, d.expected) {
-				t.Fatalf("New() failed. Exp: %v got: %v", d.expected, rows)
+			if !reflect.DeepEqual(rows, data.expected) {
+				t.Fatalf("Rows() works incorrectly. Expected: %v got: %v", data.expected, rows)
 			}
 		})
 	}
 }
 
 func TestMatrix_Cols(t *testing.T) {
-	cases := map[string]struct {
+	testCases := map[string]struct {
 		str      string
 		expected [][]int
 	}{
-		"simple matrix": {
-			`1 2
-3 4`,
-			[][]int{{1, 3}, {2, 4}},
+		"Test Cols() of 2x2 matrix": {
+			`0 1
+2 3`,
+			[][]int{{0, 2}, {1, 3}},
 		},
-		"single element": {
-			`42`,
-			[][]int{{42}},
+		"Test of Cols() 1x1 matrix": {
+			`0`,
+			[][]int{{0}},
 		},
-		"one column": {
-			`1
+		"Test of of Cols() 1x4 matrix": {
+			`0 1 2 3`,
+			[][]int{{0}, {1}, {2}, {3}},
+		},
+		"Test of of Cols()4x1 matrix": {
+			`0
+1
 2
-3
-4`,
-			[][]int{{1, 2, 3, 4}},
-		},
-		"one row": {
-			`1 2 3 4`,
-			[][]int{{1}, {2}, {3}, {4}},
+3`,
+			[][]int{{0, 1, 2, 3}},
 		},
 	}
-	for name, data := range cases {
-		d := data
-		t.Run(name, func(t *testing.T) {
-			m, err := New(d.str)
+	for testName, testData := range testCases {
+		data := testData
+		t.Run(testName, func(t *testing.T) {
+			matrix, err := New(data.str)
 			if err != nil {
-				t.Fatal("New(): unexpected error:", err)
+				t.Fatal("Error during matrix creation:", err)
 			}
-			if m == nil {
-				t.Fatal("New(): nil return on error condition")
+			if matrix == nil {
+				t.Fatal("Nil matrix has been returned")
 			}
-			cols := m.Cols()
+			cols := matrix.Cols()
 			if cols == nil {
-				t.Fatal("Rows(): nil return on error condition")
+				t.Fatal("Cols() returned nil")
 			}
-			if !reflect.DeepEqual(cols, d.expected) {
-				t.Fatalf("New() failed. Exp: %v got: %v", d.expected, cols)
+			if !reflect.DeepEqual(cols, data.expected) {
+				t.Fatalf("Cols() works incorrectly. Expected: %v got: %v", data.expected, cols)
 			}
 		})
 	}
 }
 
 func TestMatrix_Set(t *testing.T) {
-	cases := map[string]struct {
+	testCases := map[string]struct {
 		row, col, value int
 		expected        *Matrix
 		ok              bool
 	}{
-		"row underflow": {
-			-1, 0, 42,
-			&Matrix{2, 2, []int{1, 2, 3, 4}},
-			false,
-		},
-		"row overflow": {
-			2, 0, 42,
-			&Matrix{2, 2, []int{1, 2, 3, 4}},
-			false,
-		},
-		"col underflow": {
-			0, -1, 42,
-			&Matrix{2, 2, []int{1, 2, 3, 4}},
-			false,
-		},
-		"col overflow": {
-			0, 2, 42,
-			&Matrix{2, 2, []int{1, 2, 3, 4}},
-			false,
-		},
-		"set 0 0": {
-			0, 0, 42,
-			&Matrix{2, 2, []int{42, 2, 3, 4}},
+		"Test Set() 0 0": {
+			0, 0, -1,
+			&Matrix{2, 2, []int{-1, 1, 2, 3}},
 			true,
 		},
-		"set 0 1": {
-			0, 1, 42,
-			&Matrix{2, 2, []int{1, 42, 3, 4}},
+		"Test Set() 0 1": {
+			0, 1, -1,
+			&Matrix{2, 2, []int{0, -1, 2, 3}},
 			true,
 		},
-		"set 1 0": {
-			1, 0, 42,
-			&Matrix{2, 2, []int{1, 2, 42, 4}},
+		"Test Set() 1 0": {
+			1, 0, -1,
+			&Matrix{2, 2, []int{0, 1, -1, 3}},
 			true,
 		},
-		"set 1 1": {
-			1, 1, 42,
-			&Matrix{2, 2, []int{1, 2, 3, 42}},
+		"Test Set() 1 1": {
+			1, 1, -1,
+			&Matrix{2, 2, []int{0, 1, 2, -1}},
 			true,
+		},
+		"Test Set(), row number is negative": {
+			-1, 0, -1,
+			&Matrix{2, 2, []int{0, 1, 2, 3}},
+			false,
+		},
+		"Test Set(), row number is out if index range": {
+			2, 0, -1,
+			&Matrix{2, 2, []int{0, 1, 2, 3}},
+			false,
+		},
+		"Test Set(), col number is negative": {
+			0, -1, -1,
+			&Matrix{2, 2, []int{0, 1, 2, 3}},
+			false,
+		},
+		"Test Set(), col number is out if index range": {
+			0, 2, -1,
+			&Matrix{2, 2, []int{0, 1, 2, 3}},
+			false,
 		},
 	}
-	for name, data := range cases {
-		d := data
+	for testName, testData := range testCases {
+		data := testData
 
-		t.Run(name, func(t *testing.T) {
-			m, err := New(`1 2
-3 4`)
+		t.Run(testName, func(t *testing.T) {
+			matrix, err := New(`0 1
+2 3`)
 			if err != nil {
-				t.Fatal("New(): unexpected error:", err)
+				t.Fatal("Error during matrix creation:", err)
 			}
-			ok := m.Set(d.row, d.col, d.value)
-			if ok != d.ok {
-				t.Errorf("unexpected ok value: exp: %v, got: %v", d.ok, ok)
+			ok := matrix.Set(data.row, data.col, data.value)
+			if ok != data.ok {
+				t.Errorf("Set() works with error. Expected: %v, got: %v", data.ok, ok)
 			}
-			if !reflect.DeepEqual(*m, *d.expected) {
-				t.Fatalf("unexpected set results. Exp: %v got: %v", *d.expected, *m)
+			if !reflect.DeepEqual(*matrix, *data.expected) {
+				t.Fatalf("Set() works incorrectly. Expected: %v got: %v", *data.expected, *matrix)
 			}
 		})
 	}
